@@ -3,14 +3,14 @@ package com.example.weatherapp
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.bumptech.glide.Glide
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.loopj.android.http.AsyncHttpClient
 import com.loopj.android.http.JsonHttpResponseHandler
 import cz.msebera.android.httpclient.Header
@@ -18,13 +18,14 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var tvTemperature: TextView
-    private lateinit var tvCondition: TextView
     private lateinit var tvLocation: TextView
-    private lateinit var ivWeatherIcon: ImageView
     private lateinit var btnRefresh: Button
     private lateinit var etCitySearch: EditText
     private lateinit var btnSearch: Button
+    private lateinit var rvWeatherForecast: RecyclerView
+
+    private val weatherList = ArrayList<WeatherItem>()
+    private lateinit var weatherAdapter: WeatherAdapter
 
     private val client = AsyncHttpClient()
     private var latitude = "39.9526"  // Default: Philadelphia latitude
@@ -43,13 +44,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Initialize UI references
-        tvTemperature = findViewById(R.id.tvTemperature)
-        tvCondition = findViewById(R.id.tvCondition)
         tvLocation = findViewById(R.id.tvLocation)
-        ivWeatherIcon = findViewById(R.id.ivWeatherIcon)
         btnRefresh = findViewById(R.id.btnRefresh)
         etCitySearch = findViewById(R.id.etCitySearch)
         btnSearch = findViewById(R.id.btnSearch)
+        rvWeatherForecast = findViewById(R.id.rvWeatherForecast)
+
+        // Setup RecyclerView
+        rvWeatherForecast.layoutManager = LinearLayoutManager(this)
+        weatherAdapter = WeatherAdapter(weatherList)
+        rvWeatherForecast.adapter = weatherAdapter
 
         // Fetch weather initially
         fetchWeather()
@@ -105,32 +109,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchWeather() {
-        val url = "https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current_weather=true"
+        // Request 7-day daily forecast with max/min temperature and weather code
+        val url = "https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto"
 
         client.get(url, object : JsonHttpResponseHandler() {
             override fun onSuccess(statusCode: Int, headers: Array<out Header>?, response: JSONObject) {
-                val current = response.getJSONObject("current_weather")
-                val temperature = current.getDouble("temperature")
-                val windspeed = current.getDouble("windspeed")
-                val weatherCode = current.getInt("weathercode")
+                try {
+                    val daily = response.getJSONObject("daily")
+                    val dates = daily.getJSONArray("time")
+                    val maxTemps = daily.getJSONArray("temperature_2m_max")
+                    val minTemps = daily.getJSONArray("temperature_2m_min")
+                    val weatherCodes = daily.getJSONArray("weathercode")
 
-                tvTemperature.text = "Temperature: ${temperature}°C"
-                tvCondition.text = "Wind Speed: $windspeed km/h"
-                tvLocation.text = cityName
+                    // Clear previous data
+                    weatherList.clear()
 
-                // Simple weather icon mapping
-                val iconUrl = when (weatherCode) {
-                    0 -> "https://img.icons8.com/fluency/48/000000/sun.png"
-                    in 1..3 -> "https://img.icons8.com/fluency/48/000000/partly-cloudy-day.png"
-                    else -> "https://img.icons8.com/fluency/48/000000/cloud.png"
+                    // Populate list with forecast data
+                    for (i in 0 until dates.length()) {
+                        val weatherItem = WeatherItem(
+                            date = dates.getString(i),
+                            maxTemperature = maxTemps.getDouble(i),
+                            minTemperature = minTemps.getDouble(i),
+                            weatherCode = weatherCodes.getInt(i)
+                        )
+                        weatherList.add(weatherItem)
+                    }
+
+                    // Update UI
+                    tvLocation.text = cityName
+                    weatherAdapter.notifyDataSetChanged()
+
+                } catch (e: Exception) {
+                    Toast.makeText(this@MainActivity, "Error parsing weather data", Toast.LENGTH_SHORT).show()
                 }
-                Glide.with(this@MainActivity).load(iconUrl).into(ivWeatherIcon)
             }
 
             override fun onFailure(statusCode: Int, headers: Array<out Header>?, throwable: Throwable?, errorResponse: JSONObject?) {
-                tvTemperature.text = "Failed to load weather"
-                tvCondition.text = ""
-                tvLocation.text = ""
+                Toast.makeText(this@MainActivity, "Failed to load weather", Toast.LENGTH_SHORT).show()
             }
         })
     }
