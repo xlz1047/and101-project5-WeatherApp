@@ -1,36 +1,38 @@
-# AND101 Project 5 - Choose Your Own API
+# AND101 Project 6 - CYOAPI Part 2: RecyclerView Edition
 
 Submitted by: **Xin Zheng**
 
-Time spent: **5** hours spent in total
+Time spent: **8** hours spent in total
 
 ## Summary
 
-**Weather App** is an android app that **displays current weather information for any city in the world using the Open-Meteo API. Users can search for cities and view temperature, wind speed, and weather conditions with icons.**
+**Weather Forecast App** is an android app that **displays a 7-day weather forecast for any city in the world using the Open-Meteo API. The app uses a RecyclerView to show daily forecasts with high/low temperatures, weather conditions, and icons.**
 
-If I had to describe this project in three (3) emojis, they would be: **🌤️ 🌍 🔍**
+If I had to describe this project in three (3) emojis, they would be: **🌤️ 📜 🔄**
 
 ## Application Features
 
 The following REQUIRED features are completed:
 
 - [x] Make an API call to an API of your choice using AsyncHTTPClient
-- [x] Display at least three (3) pieces of data for each API entry retrieved
-- [x] A working Button requests a new API entry and updates the data displayed
+- [x] Implement a RecyclerView to display a list of entries from the API
+- [x] Display at least three (3) pieces of data for each RecyclerView item
 
 The following STRETCH features are implemented:
 
-- [x] Add a query to the API request
-  - The query I added is **city name (using Open-Meteo Geocoding API to convert city names to latitude/longitude coordinates)**
-- [x] Build a UI to allow users to add that query
+- [x] Add a UI element for the user to interact with API further
+- [ ] Show a `Toast` or `Snackbar` when an item is clicked
+- [ ] Add item dividers with `DividerItemDecoration`
 
 The following EXTRA features are implemented:
 
-- [x] Added weather icons that change based on weather conditions
-- [x] Implemented city search functionality to check weather worldwide
-- [x] Used Glide library for efficient image loading
-- [x] Added Toast messages for user feedback on search errors
-- [x] Default location set to Philadelphia, PA
+- [x] Implemented CardView design for each forecast item
+- [x] Added city search functionality to check weather worldwide
+- [x] Used Glide library for efficient weather icon loading
+- [x] Formatted dates to display as "Day, Month Date" format
+- [x] Comprehensive weather code mapping (clear, cloudy, rainy, snowy, thunderstorm, etc.)
+- [x] Added Toast messages for error handling
+- [x] Integrated Geocoding API to convert city names to coordinates
 
 ## API Choice
 
@@ -42,36 +44,35 @@ I also used the **Open-Meteo Geocoding API** (https://geocoding-api.open-meteo.c
 
 Here's a video / GIF that demos all of the app's implemented features:
 
-<img src='https://github.com/xlz1047/and101-project5-WeatherApp/blob/master/Result.gif' title='Video Demo' width='' alt='Video Demo' />
+<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Demo' width='' alt='Video Demo' />
 
-GIF created with **ScreenToGif** (or your chosen tool)
-
-<!-- Recommended tools:
-- [Kap](https://getkap.co/) for macOS
-- [ScreenToGif](https://www.screentogif.com/) for Windows
-- [peek](https://github.com/phw/peek) for Linux. -->
+GIF created with **ScreenToGif**
 
 ## Notes
 
 ### What I Learned:
-- How to make HTTP requests using AsyncHTTPClient in Android
-- Working with JSON responses and parsing weather data
-- Implementing the Glide library for loading images from URLs
-- Using multiple APIs together (Weather API + Geocoding API)
-- Handling user input validation and error cases
-- The importance of adding Internet permissions in AndroidManifest.xml
+* How to implement RecyclerView with custom adapters in Android
+* Creating and using data classes (models) for structured data
+* Working with CardView for better UI design
+* Implementing ViewHolder pattern for efficient RecyclerView performance
+* Parsing complex JSON responses with arrays of daily forecast data
+* Using SimpleDateFormat to format dates for better user experience
+* The importance of notifyDataSetChanged() for updating RecyclerView data
+* How to structure layouts using ConstraintLayout within RecyclerView items
 
 ### Challenges:
-- Initially forgot to add Internet permission, which caused "Failed to load weather" errors
-- Had to figure out how to convert city names to coordinates using a geocoding API
-- Learning how to properly parse JSON responses with nested objects
+* Initially had type mismatch errors between List and ArrayList when setting up the adapter
+* Understanding the difference between current weather API and daily forecast API endpoints
+* Figuring out how to properly update RecyclerView data after API calls
+* Learning to map weather codes to appropriate icons and descriptions
+* Handling the layout constraints for RecyclerView items to display properly
 
-### Future Improvements:
-- Add a 7-day forecast feature
-- Display more weather details (humidity, precipitation, UV index)
-- Save favorite cities
-- Add background images that change based on weather conditions
-- Implement current location detection using GPS
+### Improvements from Project 5:
+* Upgraded from single weather display to 7-day forecast list
+* Better organized code with separate adapter and data model files
+* More comprehensive weather information with high/low temperatures
+* Improved visual design with CardView and better spacing
+* Enhanced user experience with formatted dates
 
 ## License
 
